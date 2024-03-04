@@ -42,8 +42,10 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -92,14 +94,24 @@ public class History {
     }
 
     static public void writeOneChange(Writer writer, Change change, Pool pool) throws IOException {
-        Properties options = new Properties();
-        options.setProperty("mode", "save");
-        options.put("pool", pool);
+        Map<String, String> options = new HashMap<>();
+        options.put("mode", "save");
+        options.put("pool", pool.toString());
 
         writeOneChange(writer, change, options);
     }
 
+    @Deprecated
     static public void writeOneChange(Writer writer, Change change, Properties options) throws IOException {
+        writer.write(RefineServlet.VERSION);
+        writer.write('\n');
+        writer.write(change.getClass().getName());
+        writer.write('\n');
+
+        change.save(writer, options);
+    }
+
+    static public void writeOneChange(Writer writer, Change change, Map<String, String> options) throws IOException {
         writer.write(RefineServlet.VERSION);
         writer.write('\n');
         writer.write(change.getClass().getName());

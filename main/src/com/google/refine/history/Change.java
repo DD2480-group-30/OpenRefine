@@ -35,6 +35,7 @@ package com.google.refine.history;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Map;
 import java.util.Properties;
 
 import com.google.refine.model.Project;
@@ -50,5 +51,13 @@ public interface Change {
 
     public void revert(Project project);
 
+    @Deprecated
     public void save(Writer writer, Properties options) throws IOException;
+
+    public default void save(Writer writer, Map<String, String> options) throws IOException{
+        // TODO: Implement the save method to serialize changes using Map<String, String> options.
+        // This new method replaces the deprecated save method that uses Properties.
+        // Every implementing class should define its own save logic based on its requirements and the structure of
+        // the options map.
+    }
 }

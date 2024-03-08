@@ -74,7 +74,7 @@ public class XlsExporter implements StreamExporter2 {
 
     @Override
     public void export(final Project project, Properties params, Engine engine,
-            OutputStream outputStream) throws IOException {
+                       OutputStream outputStream) throws IOException {
 
         final Workbook wb = xml ? new SXSSFWorkbook() : new HSSFWorkbook();
 

@@ -72,7 +72,6 @@ public class XlsExporter implements StreamExporter2 {
         return xml ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" : "application/vnd.ms-excel";
     }
 
-    @Deprecated
     @Override
     public void export(final Project project, Properties params, Engine engine,
             OutputStream outputStream) throws IOException {

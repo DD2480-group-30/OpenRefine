@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -50,7 +51,7 @@ import com.google.refine.browsing.Engine;
 import com.google.refine.model.Project;
 import com.google.refine.util.ParsingUtilities;
 
-public class OdsExporter implements StreamExporter {
+public class OdsExporter implements StreamExporter2 {
 
     @Override
     public String getContentType() {
@@ -58,16 +59,53 @@ public class OdsExporter implements StreamExporter {
     }
 
     @Override
+    public void export(Project project, Map<String, String> params, Engine engine, 
+            OutputStream outputStream) throws IOException {
+        final OdfSpreadsheetDocument odfDoc = getOdfDoc();
+
+        TabularSerializer serializer = getSerializer(project, odfDoc);
+
+        CustomizableTabularExporterUtilities.exportRows(
+                project, engine, params, serializer);
+
+        try {
+            odfDoc.save(outputStream);
+        } catch (Exception e) {
+            throw new IOException("Error saving spreadsheet", e);
+        }
+        outputStream.flush();
+    }
+
+    @Override
     public void export(final Project project, Properties params, Engine engine,
             OutputStream outputStream) throws IOException {
 
+        final OdfSpreadsheetDocument odfDoc = getOdfDoc();
+
+        TabularSerializer serializer = getSerializer(project, odfDoc);
+
+        CustomizableTabularExporterUtilities.exportRows(
+                project, engine, params, serializer);
+
+        try {
+            odfDoc.save(outputStream);
+        } catch (Exception e) {
+            throw new IOException("Error saving spreadsheet", e);
+        }
+        outputStream.flush();
+    }
+
+    private OdfSpreadsheetDocument getOdfDoc() throws IOException {
         final OdfSpreadsheetDocument odfDoc;
         try {
             odfDoc = OdfSpreadsheetDocument.newSpreadsheetDocument();
         } catch (Exception e) {
             throw new IOException("Failed to create spreadsheet", e);
         }
+        return odfDoc;
+    }
 
+    private TabularSerializer getSerializer(final Project project, final OdfSpreadsheetDocument odfDoc) {
         TabularSerializer serializer = new TabularSerializer() {
 
             OdfTable table;
@@ -131,16 +169,10 @@ public class OdsExporter implements StreamExporter {
                 }
             }
         };
-
-        CustomizableTabularExporterUtilities.exportRows(
-                project, engine, params, serializer);
-
-        try {
-            odfDoc.save(outputStream);
-        } catch (Exception e) {
-            throw new IOException("Error saving spreadsheet", e);
-        }
-        outputStream.flush();
+        return serializer;
     }
+
+
+
 
 }

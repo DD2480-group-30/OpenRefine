@@ -81,6 +81,26 @@ abstract public class CustomizableTabularExporterUtilities {
             final TabularSerializer serializer) {
 
         String optionsString = (params != null) ? params.getProperty("options") : null;
+        
+        
+        exportRowsWithOptionsString(project, engine, serializer, optionsString);
+    }
+
+    static public void exportRows(
+            final Project project,
+            final Engine engine,
+            Map<String, String> params,
+            final TabularSerializer serializer) {
+
+        String optionsString = (params != null) ? params.get("options") : null;
+        
+        
+        exportRowsWithOptionsString(project, engine, serializer, optionsString);
+    }
+
+    private static void exportRowsWithOptionsString(final Project project, final Engine engine, final TabularSerializer serializer,
+            String optionsString) {
+
         JsonNode optionsTemp = null;
         if (optionsString != null) {
             try {

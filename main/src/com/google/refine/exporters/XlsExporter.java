@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -51,13 +52,14 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.jetbrains.annotations.NotNull;
 
 import com.google.refine.ProjectManager;
 import com.google.refine.browsing.Engine;
 import com.google.refine.model.Project;
 import com.google.refine.util.ParsingUtilities;
 
-public class XlsExporter implements StreamExporter {
+public class XlsExporter implements StreamExporter2 {
 
     final private boolean xml;
 
@@ -70,12 +72,41 @@ public class XlsExporter implements StreamExporter {
         return xml ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" : "application/vnd.ms-excel";
     }
 
+    @Deprecated
     @Override
     public void export(final Project project, Properties params, Engine engine,
             OutputStream outputStream) throws IOException {
 
         final Workbook wb = xml ? new SXSSFWorkbook() : new HSSFWorkbook();
 
+        TabularSerializer serializer = getTabularSerializer(project, wb);
+
+        CustomizableTabularExporterUtilities.exportRows(
+                project, engine, params, serializer);
+
+        wb.write(outputStream);
+        outputStream.flush();
+        wb.close();
+    }
+
+    @Override
+    public void export(final Project project, Map<String,String> params, Engine engine,
+                       OutputStream outputStream) throws IOException {
+
+        final Workbook wb = xml ? new SXSSFWorkbook() : new HSSFWorkbook();
+
+        TabularSerializer serializer = getTabularSerializer(project, wb);
+
+        CustomizableTabularExporterUtilities.exportRows(
+                project, engine, params, serializer);
+
+        wb.write(outputStream);
+        outputStream.flush();
+        wb.close();
+    }
+
+    @NotNull
+    private TabularSerializer getTabularSerializer(Project project, Workbook wb) {
         TabularSerializer serializer = new TabularSerializer() {
 
             Sheet s;
@@ -147,13 +178,7 @@ public class XlsExporter implements StreamExporter {
                 }
             }
         };
-
-        CustomizableTabularExporterUtilities.exportRows(
-                project, engine, params, serializer);
-
-        wb.write(outputStream);
-        outputStream.flush();
-        wb.close();
+        return serializer;
     }
 
     /**

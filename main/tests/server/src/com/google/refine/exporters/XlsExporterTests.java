@@ -47,7 +47,10 @@ import java.util.Properties;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.SpreadsheetVersion;
-
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -290,11 +293,17 @@ public class XlsExporterTests extends RefineTest {
 
         Assert.assertEquals(stream.size(), 4096);
 
-        try (HSSFWorkbook wb = new HSSFWorkbook(new ByteArrayInputStream(stream.toByteArray()))) {
+        ByteArrayInputStream inStream = new ByteArrayInputStream(stream.toByteArray());
+        try {
+            HSSFWorkbook wb = new HSSFWorkbook(inStream);
             org.apache.poi.ss.usermodel.Sheet ws = wb.getSheetAt(0);
             org.apache.poi.ss.usermodel.Row row1 = ws.getRow(1);
             org.apache.poi.ss.usermodel.Cell cell0 = row1.getCell(0);
             Assert.assertEquals(cell0.toString(), "row0cell0");
+            wb.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Assert.fail("i/o exception occurred on working with HSSFWorkbook");
         }
     }
 }

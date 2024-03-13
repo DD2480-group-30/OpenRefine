@@ -296,7 +296,7 @@ public class XlsxExporterTests extends RefineTest {
             wb.close();
         } catch (IOException e) {
             e.printStackTrace();
-            Assert.fail("i/o exception occurred on creating XSSFWorkbook");
+            Assert.fail("i/o exception occurred on working with XSSFWorkbook");
         }
     }
 }

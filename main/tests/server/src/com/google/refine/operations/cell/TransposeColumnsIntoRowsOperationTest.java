@@ -2,9 +2,7 @@
 package com.google.refine.operations.cell;
 
 import java.io.Serializable;
-import java.util.Properties;
 
-import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
@@ -15,7 +13,6 @@ import com.google.refine.RefineTest;
 import com.google.refine.model.AbstractOperation;
 import com.google.refine.model.Project;
 import com.google.refine.operations.OperationRegistry;
-import com.google.refine.process.Process;
 
 public class TransposeColumnsIntoRowsOperationTest extends RefineTest {
 
@@ -45,13 +42,18 @@ public class TransposeColumnsIntoRowsOperationTest extends RefineTest {
     @Test
     public void testCreateHistoryEntry_transposeIntoOneColumn_removeRowForNullOrEmptyCell() throws Exception {
         AbstractOperation op = new TransposeColumnsIntoRowsOperation("num1", -1, true, false, "a", true, ":");
-        Process process = op.createProcess(project, new Properties());
-        process.performImmediate();
 
-        Assert.assertEquals("num1:2", project.rows.get(0).cells.get(0).value);
-        Assert.assertEquals("num2:3", project.rows.get(1).cells.get(0).value);
-        Assert.assertEquals("num1:6", project.rows.get(2).cells.get(0).value);
-        Assert.assertEquals("num1:5", project.rows.get(3).cells.get(0).value);
-        Assert.assertEquals("num2:9", project.rows.get(4).cells.get(0).value);
+        runOperation(op, project);
+
+        Project expectedProject = createProject(
+                new String[] { "a" },
+                new Serializable[][] {
+                        { "num1:2" },
+                        { "num2:3" },
+                        { "num1:6" },
+                        { "num1:5" },
+                        { "num2:9" },
+                });
+        assertProjectEquals(project, expectedProject);
     }
 }

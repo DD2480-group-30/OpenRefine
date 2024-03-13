@@ -29,7 +29,6 @@ package com.google.refine.operations.column;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Properties;
 
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -40,7 +39,6 @@ import com.google.refine.RefineTest;
 import com.google.refine.model.AbstractOperation;
 import com.google.refine.model.Project;
 import com.google.refine.operations.OperationRegistry;
-import com.google.refine.process.Process;
 import com.google.refine.util.TestUtils;
 
 public class ColumnReorderOperationTests extends RefineTest {
@@ -73,25 +71,24 @@ public class ColumnReorderOperationTests extends RefineTest {
     @Test
     public void testEraseCellsOnRemovedColumns() throws Exception {
 
-        int aCol = project.columnModel.getColumnByName("a").getCellIndex();
         int bCol = project.columnModel.getColumnByName("b").getCellIndex();
         int cCol = project.columnModel.getColumnByName("c").getCellIndex();
 
-        Assert.assertEquals(project.rows.get(0).getCellValue(aCol), "1|2");
-        Assert.assertEquals(project.rows.get(0).getCellValue(bCol), "d");
-        Assert.assertEquals(project.rows.get(0).getCellValue(cCol), "e");
-        Assert.assertEquals(project.rows.get(1).getCellValue(aCol), "3");
-        Assert.assertEquals(project.rows.get(1).getCellValue(bCol), "f");
-        Assert.assertEquals(project.rows.get(1).getCellValue(cCol), "g");
-
         AbstractOperation op = new ColumnReorderOperation(Arrays.asList("a"));
-        Process process = op.createProcess(project, new Properties());
-        process.performImmediate();
 
-        Assert.assertEquals(project.rows.get(0).getCellValue(aCol), "1|2");
+        runOperation(op, project);
+
+        Project expectedProject = createProject(
+                new String[] { "a" },
+                new Serializable[][] {
+                        { "1|2" },
+                        { "3" },
+                });
+        assertProjectEquals(project, expectedProject);
+
+        // deleted cell indices are nulled out
         Assert.assertEquals(project.rows.get(0).getCellValue(bCol), null);
         Assert.assertEquals(project.rows.get(0).getCellValue(cCol), null);
-        Assert.assertEquals(project.rows.get(1).getCellValue(aCol), "3");
         Assert.assertEquals(project.rows.get(1).getCellValue(bCol), null);
         Assert.assertEquals(project.rows.get(1).getCellValue(cCol), null);
 

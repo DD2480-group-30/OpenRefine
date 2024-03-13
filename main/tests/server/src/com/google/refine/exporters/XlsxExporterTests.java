@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package com.google.refine.exporters;
 
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
 import java.io.ByteArrayInputStream;
@@ -42,6 +41,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Properties;
 
 import org.apache.poi.ss.SpreadsheetVersion;
@@ -101,8 +101,7 @@ public class XlsxExporterTests extends RefineTest {
         ProjectManager.singleton.registerProject(project, projectMetadata);
         engine = new Engine(project);
         options = mock(Properties.class);
-        options2 = mock(Map.class);
-
+        options2 = new HashMap<String,String>();
     }
 
     @AfterMethod

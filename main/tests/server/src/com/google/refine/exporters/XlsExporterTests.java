@@ -42,6 +42,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -99,7 +100,7 @@ public class XlsExporterTests extends RefineTest {
         ProjectManager.singleton.registerProject(project, projectMetadata);
         engine = new Engine(project);
         options = mock(Properties.class);
-        options2 = mock(Map.class);
+        options2 = new HashMap<String,String>();;
     }
 
     @AfterMethod

@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package com.google.refine.exporters;
 
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
 import java.io.ByteArrayInputStream;
@@ -281,7 +282,8 @@ public class XlsxExporterTests extends RefineTest {
         try {
             SUT2.export(project, options2, engine, stream);
         } catch (IOException e) {
-            Assert.fail();
+            e.printStackTrace();
+            Assert.fail("i/o exception occurred on export");
         }
 
         ByteArrayInputStream inStream = new ByteArrayInputStream(stream.toByteArray());
@@ -293,7 +295,8 @@ public class XlsxExporterTests extends RefineTest {
             Assert.assertEquals(cell0.toString(), "row0cell0");
             wb.close();
         } catch (IOException e) {
-            Assert.fail();
+            e.printStackTrace();
+            Assert.fail("i/o exception occurred on creating XSSFWorkbook");
         }
     }
 }

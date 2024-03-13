@@ -284,7 +284,8 @@ public class XlsExporterTests extends RefineTest {
         try {
             SUT2.export(project, options2, engine, stream);
         } catch (IOException e) {
-            Assert.fail();
+            e.printStackTrace();
+            Assert.fail("i/o exception occurred on export");
         }
 
         Assert.assertEquals(stream.size(), 4096);

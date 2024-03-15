@@ -42,6 +42,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -80,13 +82,16 @@ public class XlsExporterTests extends RefineTest {
     Project project;
     Engine engine;
     Properties options;
+    Map<String,String> options2;
 
     // System Under Test
     StreamExporter SUT;
+    StreamExporter2 SUT2;
 
     @BeforeMethod
     public void SetUp() {
         SUT = new XlsExporter(false);
+        SUT2 = new XlsExporter(false);
         stream = new ByteArrayOutputStream();
         ProjectManager.singleton = new ProjectManagerStub();
         projectMetadata = new ProjectMetadata();
@@ -95,16 +100,19 @@ public class XlsExporterTests extends RefineTest {
         ProjectManager.singleton.registerProject(project, projectMetadata);
         engine = new Engine(project);
         options = mock(Properties.class);
+        options2 = new HashMap<String,String>();;
     }
 
     @AfterMethod
     public void TearDown() {
         SUT = null;
+        SUT2 = null;
         stream = null;
         ProjectManager.singleton.deleteProject(project.id);
         project = null;
         engine = null;
         options = null;
+        options2 = null;
     }
 
     @Test
@@ -261,6 +269,38 @@ public class XlsExporterTests extends RefineTest {
                 row.cells.add(new Cell(now, null));
             }
             project.rows.add(row);
+        }
+    }
+
+    @Test
+    public void getContentTypeStreamExporter2() {
+        Assert.assertEquals(SUT2.getContentType(), "application/vnd.ms-excel");
+    }
+
+    @Test
+    public void exportSimpleXlsStreamExporter2() throws IOException {
+        CreateGrid(2, 2);
+
+        try {
+            SUT2.export(project, options2, engine, stream);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Assert.fail("i/o exception occurred on export");
+        }
+
+        Assert.assertEquals(stream.size(), 4096);
+
+        ByteArrayInputStream inStream = new ByteArrayInputStream(stream.toByteArray());
+        try {
+            HSSFWorkbook wb = new HSSFWorkbook(inStream);
+            org.apache.poi.ss.usermodel.Sheet ws = wb.getSheetAt(0);
+            org.apache.poi.ss.usermodel.Row row1 = ws.getRow(1);
+            org.apache.poi.ss.usermodel.Cell cell0 = row1.getCell(0);
+            Assert.assertEquals(cell0.toString(), "row0cell0");
+            wb.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Assert.fail("i/o exception occurred on working with HSSFWorkbook");
         }
     }
 }
